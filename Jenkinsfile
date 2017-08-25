@@ -9,22 +9,11 @@ node{
     properties([
         disableConcurrentBuilds()
         ])
+        if (utils.isCI()){
+                            def name = "dotnet"
+                            def location = "https://raw.githubusercontent.com/redhat-developer/s2i-dotnetcore/master/dotnet_imagestreams.json"
+                           if (flow.openShiftImageStreamInstall(name,location)){
+                                echo "YAYYYY!!!!!"
+                           }
+                        }
 }
-
-    dockerNode{
-        timeout(time: 1, unit: 'HOURS') {
-            ws {
-                checkout scm
-                readTrusted 'release.groovy'
-                def pipeline = load 'release.groovy'
-
-                if (utils.isCI()){
-                    def name = "dotnet"
-                    def location = "https://raw.githubusercontent.com/redhat-developer/s2i-dotnetcore/master/dotnet_imagestreams.json"
-                   if (flow.openShiftImageStreamInstall(name,location)){
-                        echo "YAYYYY!!!!!"
-                   }
-                }
-            }
-        }
-    }
