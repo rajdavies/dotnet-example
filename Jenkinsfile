@@ -19,9 +19,9 @@ node{
                 def pipeline = load 'release.groovy'
 
                 if (utils.isCI()){
-
-                   if (flow.openShiftImageStreamInstall("dotnet", "https://raw.githubusercontent.com/redhat-developer/s2i-dotnetcore/master/dotnet_imagestreams.json
-")){
+                    def name = "dotnet"
+                    def location = "https://raw.githubusercontent.com/redhat-developer/s2i-dotnetcore/master/dotnet_imagestreams.json"
+                   if (flow.openShiftImageStreamInstall(name,location)){
                         echo "YAYYYY!!!!!"
                    }
                 }
