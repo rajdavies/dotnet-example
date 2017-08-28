@@ -1,10 +1,5 @@
 #!/usr/bin/groovy
-<<<<<<< HEAD
-
 @Library('github.com/rajdavies/fabric8-pipeline-library@dev11')
-=======
-@Library('github.com/fabric8io/fabric8-pipeline-library@master')
->>>>>>> 589d463425149f8131c9e27b397cbc09b6bbe297
 
 def localItestPattern = ""
 try {
@@ -36,29 +31,28 @@ def envStage = utils.environmentNamespace('stage')
 def envProd = utils.environmentNamespace('run')
 def stashName = ""
 def deploy = false
-mavenNode {
+node {
   checkout scm
-  if (utils.isCI()){
 
-    mavenCI{}
-    
-  } else if (utils.isCD()){
+  def name = "dotnet"
+          def location = "https://raw.githubusercontent.com/redhat-developer/s2i-dotnetcore/master/dotnet_imagestreams.json"
+          if (flow.openShiftImageStreamInstall(name,location)){
+                                  echo "YAYYYY!!!!!"
+          }
+
+  if (utils.isCD()){
     deploy = true
     echo 'NOTE: running pipelines for the first time will take longer as build and base docker images are pulled onto the node'
     container(name: 'maven') {
 
       stage('Build Release'){
-        mavenCanaryRelease {
+        canaryRelease {
           version = canaryVersion
         }
       }
 
       stage('Integration Testing'){
-        mavenIntegrationTest {
-          environment = 'Test'
-          failIfNoTests = localFailIfNoTests
-          itestPattern = localItestPattern
-        }
+
       }
 
       stage('Rollout to Stage'){
