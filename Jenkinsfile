@@ -25,7 +25,7 @@ try {
 def canaryVersion = "${versionPrefix}.${env.BUILD_NUMBER}"
 
 def fabric8Console = "${env.FABRIC8_CONSOLE ?: ''}"
-def flow - new io.fabric8.Fabric8Commands()
+def flow = new io.fabric8.Fabric8Commands()
 def utils = new io.fabric8.Utils()
 def label = "buildpod.${env.JOB_NAME}.${env.BUILD_NUMBER}".replace('-', '_').replace('/', '_')
 def envStage = utils.environmentNamespace('stage')
