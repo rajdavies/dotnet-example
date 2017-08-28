@@ -1,4 +1,5 @@
 #!/usr/bin/groovy
+
 @Library('github.com/rajdavies/fabric8-pipeline-library@dev11')
 
 def localItestPattern = ""
