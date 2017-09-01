@@ -32,6 +32,8 @@ def envStage = utils.environmentNamespace('stage')
 def envProd = utils.environmentNamespace('run')
 def stashName = ""
 def deploy = false
+
+podTemplate (label: 'myPod'){
 node {
   checkout scm
 
@@ -82,5 +84,6 @@ if (deploy){
           kubernetesApply(environment: envProd)
         }
     }
+}
 }
 
