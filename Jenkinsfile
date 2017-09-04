@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-@Library('github.com/rajdavies/fabric8-pipeline-library@dev11')
+@Library('github.com/fabric8io/fabric8-pipeline-library@master')
 
 def localItestPattern = ""
 try {
@@ -25,37 +25,35 @@ try {
 def canaryVersion = "${versionPrefix}.${env.BUILD_NUMBER}"
 
 def fabric8Console = "${env.FABRIC8_CONSOLE ?: ''}"
-def flow = new io.fabric8.Fabric8Commands()
 def utils = new io.fabric8.Utils()
 def label = "buildpod.${env.JOB_NAME}.${env.BUILD_NUMBER}".replace('-', '_').replace('/', '_')
 def envStage = utils.environmentNamespace('stage')
 def envProd = utils.environmentNamespace('run')
 def stashName = ""
 def deploy = false
-
-podTemplate (label: 'myPod'){
-node {
+mavenNode {
   checkout scm
+  if (utils.isCI()){
 
-  def name = "dotnet"
-          def location = "https://raw.githubusercontent.com/redhat-developer/s2i-dotnetcore/master/dotnet_imagestreams.json"
-          if (flow.openShiftImageStreamInstall(name,location)){
-                                  echo "YAYYYY!!!!!"
-          }
-
-  if (utils.isCD()){
+    mavenCI{}
+    
+  } else if (utils.isCD()){
     deploy = true
     echo 'NOTE: running pipelines for the first time will take longer as build and base docker images are pulled onto the node'
     container(name: 'maven') {
 
       stage('Build Release'){
-        canaryRelease {
+        mavenCanaryRelease {
           version = canaryVersion
         }
       }
 
       stage('Integration Testing'){
-
+        mavenIntegrationTest {
+          environment = 'Test'
+          failIfNoTests = localFailIfNoTests
+          itestPattern = localItestPattern
+        }
       }
 
       stage('Rollout to Stage'){
@@ -84,6 +82,5 @@ if (deploy){
           kubernetesApply(environment: envProd)
         }
     }
-}
 }
 
